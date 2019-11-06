@@ -14,7 +14,7 @@ const firebaseConfig = {
 
 export const appConfig = {
   storiesLimit: 10,
-  commentLimit: 20
+  commentsLimit: 20
 };
 
 function App() {
