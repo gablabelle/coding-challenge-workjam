@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment, Suspense } from 'react';
+import { FirebaseAppProvider } from 'reactfire';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Container from '@material-ui/core/Container';
+import 'firebase/database';
+import Header from './Header';
+import TopStories from './TopStories';
+
+const firebaseConfig = {
+  authDomain: 'hacker-news.firebaseio.com',
+  databaseURL: 'https://hacker-news.firebaseio.com/',
+  projectId: 'hacker-news'
+};
+
+export const appConfig = {
+  storiesLimit: 10,
+  commentLimit: 20
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <CssBaseline />
+      <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+        <Header />
+        <Container>
+          <Suspense fallback="Loading...">
+            <TopStories limitToFirst={appConfig.storiesLimit} />
+          </Suspense>
+        </Container>
+      </FirebaseAppProvider>
+    </Fragment>
   );
 }
 
