@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFirebaseApp } from 'reactfire';
 import { isEqual } from 'lodash';
+import StoryProvider from './StoryProvider';
 import Story from './Story';
 
 function TopStories({ limitToFirst }) {
@@ -24,9 +25,13 @@ function TopStories({ limitToFirst }) {
     };
   }, [limitToFirst, firebaseApp, stories, setStories]);
 
-  return stories.map(storyId => {
-    return <Story key={storyId} storyId={storyId} />;
-  });
+  return (
+    <StoryProvider>
+      {stories.map(storyId => {
+        return <Story key={storyId} storyId={storyId} />;
+      })}
+    </StoryProvider>
+  );
 }
 
 export default TopStories;

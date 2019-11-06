@@ -1,17 +1,30 @@
-import React from 'react';
-import { useFirebaseApp, useDatabaseObject } from 'reactfire';
+import React, { useEffect } from 'react';
+import { useFirebaseApp } from 'reactfire';
+import { isEqual } from 'lodash';
+import { useStoryContext } from './StoryProvider';
 import StoryCard from './StoryCard';
 
 function Story({ storyId }) {
-  // We don't want to store fetched stories in a store or in the context api
-  // because if a story re-enters the top 10, it's data (score, comments) will most certainly
-  // have changed and we would need to re-fetch anyway.
+  const { getStory, saveStory } = useStoryContext();
+  const story = getStory(storyId);
   const firebaseApp = useFirebaseApp();
-  const storyRef = firebaseApp.database().ref(`v0/item/${storyId}`);
-  const storyDbObj = useDatabaseObject(storyRef);
-  const story = storyDbObj.snapshot.val();
 
-  return <StoryCard story={story} />;
+  useEffect(() => {
+    const storyRef = firebaseApp.database().ref(`v0/item/${storyId}`);
+    storyRef.on('value', snapshot => {
+      const newStory = snapshot.val();
+      if (!isEqual(story, newStory)) {
+        saveStory(newStory);
+      }
+    });
+    return () => {
+      storyRef.off();
+    };
+  }, [storyId, firebaseApp, story, saveStory]);
+
+  if (!story) return null;
+
+  return <StoryCard key={storyId} story={story} />;
 }
 
 export default Story;
